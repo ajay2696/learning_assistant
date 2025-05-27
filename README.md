@@ -15,19 +15,21 @@ graph TD
         C1[Study Planner Agent]
         C2[Study Content Generator Agent]
         C3[Quiz Generator Agent]
+        D1[Rate Limiter]
+        D2[Guardrails]
         C -->|Invokes| C1
         C1 -->|Invokes| C2
         C2 -->|Invokes| C3
+        C1 -->|Enforces| D1
+        C1-->|Validates| D2
+        C2 -->|Enforces| D1
+        C2-->|Validates| D2
+        C3 -->|Enforces| D1
+        C3-->|Validates| D2
     end
 
     subgraph AI
         D[Google ADK + GenAI]
-        D1[Rate Limiter]
-        D2[Guardrails]
-        D3[Callbacks]
-        D -->|Enforces| D1
-        D -->|Validates| D2
-        D -->|Monitors| D3
     end
 
     B -->|User sends request| A
