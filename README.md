@@ -6,11 +6,32 @@ A comprehensive learning assistant that generates personalized study plans and d
 
 ```mermaid
 graph TD
-    A[React Frontend] -->|HTTP Requests| B[FastAPI Backend]
-    B -->|Processes Request| C[AI Model]
-    C -->|Generates Response| B
-    B -->|Returns Study Plan| A
-    A -->|Displays Content| D[User Interface]
+    subgraph Frontend
+        A[React App] --> B[User Interface]
+    end
+
+    subgraph Backend
+        C[FastAPI Server]
+        C1[Study Planner Agent]
+        C2[Study Content Generator Agent]
+        C3[Quiz Generator Agent]
+        C -->|Invokes| C1
+        C -->|Invokes| C2
+        C -->|Invokes| C3
+    end
+
+    subgraph AI
+        D[Google ADK + GenAI]
+    end
+
+    B -->|User sends request| A
+    A -->|HTTP request| C
+    C1 -->|Uses| D
+    C2 -->|Uses| D
+    C3 -->|Uses| D
+    C -->|Aggregated AI Response| A
+    A -->|Renders Study Plan, Content, Quizzes| B
+
 ```
 
 ## Features
