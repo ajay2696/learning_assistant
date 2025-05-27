@@ -1,6 +1,6 @@
 # Learning Assistant Application
 
-A comprehensive learning assistant that generates personalized study plans and detailed lesson content using AI. The application consists of a React frontend and a Python FastAPI backend.
+A comprehensive learning assistant that generates personalized study plans and detailed lesson content using AI. The application leverages Google ADK (AI Development Kit) with FastAPI backend and React frontend, implementing robust guardrails and rate limiting for production-grade AI interactions.
 
 ## Architecture
 
@@ -16,12 +16,18 @@ graph TD
         C2[Study Content Generator Agent]
         C3[Quiz Generator Agent]
         C -->|Invokes| C1
-        C -->|Invokes| C2
-        C -->|Invokes| C3
+        C1 -->|Invokes| C2
+        C2 -->|Invokes| C3
     end
 
     subgraph AI
         D[Google ADK + GenAI]
+        D1[Rate Limiter]
+        D2[Guardrails]
+        D3[Callbacks]
+        D -->|Enforces| D1
+        D -->|Validates| D2
+        D -->|Monitors| D3
     end
 
     B -->|User sends request| A
@@ -31,7 +37,6 @@ graph TD
     C3 -->|Uses| D
     C -->|Aggregated AI Response| A
     A -->|Renders Study Plan, Content, Quizzes| B
-
 ```
 
 ## Features
@@ -44,11 +49,19 @@ graph TD
 - Loading states and error handling
 
 ### Backend
+- FastAPI backend with Google ADK integration
+- Multi-agent architecture for specialized tasks
 - RESTful API endpoints for chat and session management
-- AI-powered study plan generation
 - Session-based conversation tracking
-- Detailed lesson content generation
-- Error handling and logging
+- Comprehensive error handling and logging
+
+### AI Integration & Safety Features
+- Google ADK integration for production-grade AI
+- Rate limiting to prevent API abuse
+- Guardrails for content safety and quality
+- Callback system for monitoring AI responses
+- Multi-agent orchestration for complex tasks
+- Content validation and filtering
 
 ## Project Structure
 
@@ -65,7 +78,10 @@ learning_assistant/
     │   ├── main.py       # Main application entry point
     │   ├── models/       # Data models
     │   ├── services/     # Business logic
-    │   └── utils/        # Utility functions
+    │   │   ├── agents/   # AI agent implementations
+    │   │   └── callbacks/ # AI monitoring callbacks
+    │   ├── utils/        # Utility functions
+    │   └── config/       # Configuration files
     └── requirements.txt
 ```
 
@@ -75,6 +91,8 @@ learning_assistant/
 - Node.js (v14 or higher)
 - Python 3.8 or higher
 - pip (Python package manager)
+- Google Cloud account with ADK access
+- API credentials for Google ADK
 
 ### Backend Setup
 
@@ -94,7 +112,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Start the backend server:
+4. Configure Google ADK credentials:
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="path/to/your/credentials.json"
+```
+
+5. Start the backend server:
 ```bash
 uvicorn app.main:app --reload --port 8082
 ```
@@ -129,6 +152,17 @@ The application will be available at:
   - Request body: `{ "text": string, "session_id": string, "user_id": string }`
   - Response: Study plan with detailed lesson content
 
+### Rate Limiting
+- Default rate limit: 100 requests per minute per user
+- Customizable limits per endpoint
+- Rate limit headers included in responses
+
+### Callbacks
+- Response validation callbacks
+- Content safety monitoring
+- Usage tracking and analytics
+- Error logging and reporting
+
 ## Usage
 
 1. Open the application in your browser
@@ -147,6 +181,9 @@ The application includes comprehensive error handling for:
 - Invalid user inputs
 - Session management errors
 - Study plan generation failures
+- Rate limit exceeded
+- Content safety violations
+- AI model errors
 
 ## Contributing
 
@@ -164,4 +201,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - React and Material-UI for the frontend framework
 - FastAPI for the backend framework
-- OpenAI for AI model integration 
+- Google ADK for AI capabilities
+- OpenAI for additional AI model integration 
